@@ -10,7 +10,10 @@ import ugfx_helper, os, wifi, ugfx, http, time, sleep, app
 import sim800
 from tilda import Buttons
 from machine import Neopix
+import utime
 
+playback_start = 0
+last_update = 0
 
 ugfx_helper.init()
 ugfx.clear()
@@ -18,29 +21,30 @@ ugfx.clear()
 
 # Clear LEDs
 leds = Neopix()
-YELLOW = 0xfee95a
-RED = 0xdf2935
+YELLOW = 0xffff00
+RED = 0xff0000
 
 CURRENT = YELLOW, RED
 
 try:
-    image = http.get("https://i.imgur.com/HY52rF4.jpg").raise_for_status().content
-    ugfx.display_image(0,0,bytearray(image))
+    ugfx.display_image(0, 0, "robotnik/robotnik.png")
 except:
     ugfx.clear()
-    ugfx.text(5, 5, "Couldn't download sponsors", ugfx.BLACK)
-
+    
 
 
 while 1:
-    sim800.startplayback(2)
-    leds.display(CURRENT)
-    if CURRENT == YELLOW, RED:
-        CURRENT = RED, YELLOW
-    else:
-        CURRENT = YELLOW, RED
+    if sim800.startplayback(2):
+        playback_start = utime.ticks_ms()
+        last_update = playback_start
+    if last_update + 80 < utime.ticks_ms():
+        leds.display(CURRENT)
+        if CURRENT == YELLOW, RED:
+            CURRENT = RED, YELLOW
+        else:
+            CURRENT = YELLOW, RED
+        last_update = utime.ticks_ms()
     if Buttons.is_pressed(Buttons.BTN_A) or Buttons.is_pressed(Buttons.BTN_Menu) or Buttons.is_pressed(Buttons.BTN_A):
         break
 
-ugfx.clear()
 app.restart_to_default()
