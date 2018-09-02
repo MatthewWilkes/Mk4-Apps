@@ -21,28 +21,26 @@ leds = Neopix()
 YELLOW = 0xfee95a
 RED = 0xdf2935
 
-CURRENT = YELLOW
-
-while 1:
-    sim800.startplayback(2)
-    time.sleep(100)
-    leds.display([CURRENT])
-    if CURRENT == YELLOW:
-        CURRENT = RED
-    else:
-        CURRENT = YELLOW
-    if Buttons.is_pressed(Buttons.BTN_A) or Buttons.is_pressed(Buttons.BTN_Menu) or Buttons.is_pressed(Buttons.BTN_A):
-        break
+CURRENT = YELLOW, RED
 
 try:
-    image = http.get("http://s3.amazonaws.com/tilda-badge/sponsors/screen.png").raise_for_status().content
+    image = http.get("https://i.imgur.com/HY52rF4.jpg").raise_for_status().content
     ugfx.display_image(0,0,bytearray(image))
 except:
     ugfx.clear()
     ugfx.text(5, 5, "Couldn't download sponsors", ugfx.BLACK)
 
-while (not Buttons.is_pressed(Buttons.BTN_A)) and (not Buttons.is_pressed(Buttons.BTN_B)) and (not Buttons.is_pressed(Buttons.BTN_Menu)):
-    sleep.wfi()
+
+
+while 1:
+    sim800.startplayback(2)
+    leds.display(CURRENT)
+    if CURRENT == YELLOW, RED:
+        CURRENT = RED, YELLOW
+    else:
+        CURRENT = YELLOW, RED
+    if Buttons.is_pressed(Buttons.BTN_A) or Buttons.is_pressed(Buttons.BTN_Menu) or Buttons.is_pressed(Buttons.BTN_A):
+        break
 
 ugfx.clear()
 app.restart_to_default()
